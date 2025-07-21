@@ -1,32 +1,36 @@
-<script>
-  export default {
-    data() {
-      return {
-        count: 0,
-      };
+<script setup>
+  defineProps({
+    title: {
+      type: String,
+      default: "title",
     },
-    methods: {
-      increment() {
-        return this.count++;
-      },
-      decrement() {
-        return this.count--;
-      },
+    price: Number,
+    isAdded: {
+      type: Boolean,
+      default: null,
     },
-  };
+  });
 </script>
 
 <template>
-  <h1>{{ count }}</h1>
-  <div class="flex gap-1">
-    <button class="border-2 p-4" @click="decrement">-</button>
-    <button class="border-2 p-4" @click="increment">+</button>
+  <div class="product">
+    <h2>Товар: {{ title }}</h2>
+    <h3>Цена: {{ price }}</h3>
+    <h3 v-if="isAdded">Добавлен: {{ isAdded }}</h3>
+
+    <slot></slot>
   </div>
-  <template />
 </template>
 
-<style>
-  .text {
-    background-color: red;
+<style scoped>
+  .product {
+    padding: 16px;
+    border: 1px solid blue;
+    background-color: white;
+  }
+
+  .slot {
+    border: 1px solid greenyellow;
+    padding: 20px;
   }
 </style>
