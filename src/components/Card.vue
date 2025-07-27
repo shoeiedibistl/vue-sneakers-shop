@@ -2,7 +2,7 @@
   defineProps({
     imageUrl: {
       type: String,
-      default: "/sneakers/sneakers-1.jpg",
+      default: "/image-placeholder.jpg",
     },
     title: {
       type: String,
