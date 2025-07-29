@@ -4,7 +4,7 @@
   import CardList from "./components/Cardlist.vue";
   import Drawer from "./components/Drawer.vue";
 
-  import { onMounted, reactive, ref, watch } from "vue";
+  import { onMounted, reactive, ref, watch, provide } from "vue";
   import axios from "axios";
 
   const items = ref([]);
@@ -38,13 +38,52 @@
           params,
         }
       );
-      items.value = data;
+      items.value = data.map((obj) => ({
+        ...obj,
+        isFavorite: false,
+        isAdded: false,
+      }));
     } catch (err) {
       console.log(err);
     }
   };
 
-  onMounted(fetchItems);
+  const fetchFavorites = async () => {
+    try {
+      const { data: favorites } = await axios.get(
+        `https://c54d42806c01eb8f.mokky.dev/favorites`
+      );
+      items.value = items.value.map((item) => {
+        const favorite = favorites.find(
+          (favorite) => favorite.productId === item.id
+        );
+
+        if (!favorite) {
+          return item;
+        }
+
+        return {
+          ...item,
+          isFavorite: true,
+          favoriteId: favorite.productId,
+        };
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const addToFavorite = async (item) => {
+    item.isFavorite = !item.isFavorite;
+    console.log(item);
+  };
+
+  provide("addToFavorite", addToFavorite);
+
+  onMounted(async () => {
+    await fetchItems();
+    await fetchFavorites();
+  });
 
   watch(filters, fetchItems);
 </script>
@@ -57,7 +96,7 @@
     <Drawer />
     -->
     <Header />
-    https://youtu.be/U_-Ht_v-oAs?si=K26i4wLVlfDrHlbo&t=13806
+    https://youtu.be/U_-Ht_v-oAs?si=vARm3v3eSu5IZwJb&t=15750
 
     <div class="flex gap-10 items-center justify-between px-10 mt-10">
       <h1 class="text-xl text-4xl font-bold">Все кроссовки</h1>

@@ -1,5 +1,8 @@
 <script setup>
+  import { inject } from "vue";
+
   defineProps({
+    id: Number,
     imageUrl: {
       type: String,
       default: "/image-placeholder.jpg",
@@ -12,7 +15,7 @@
     isAdded: Boolean,
     isFavorite: Boolean,
     onClickAdd: Function,
-    onCLickFavorite: Function,
+    onClickFavorite: Function,
   });
 
   const getAlert = () => alert("click");
@@ -25,8 +28,8 @@
     <img
       :src="!isFavorite ? '/like-1.svg' : '/like-2.svg'"
       alt="like"
-      class="absolute top-5 left-5 cursor-pointer"
-      @click="onCLickFavorite"
+      class="absolute top-5 left-5 cursor-pointer hover:drop-shadow duration-300"
+      @click="onClickFavorite"
     />
     <img :src="imageUrl" alt="sneakers" class="w-[133px] h-113px" />
     <p class="text-[14px] font-regular">{{ title }}</p>
@@ -38,7 +41,7 @@
       <img
         :src="!isAdded ? '/plus.svg' : '/checked.svg'"
         alt="plus"
-        class="cursor-pointer"
+        class="cursor-pointer hover:drop-shadow duration-300"
         @click="onClickAdd"
       />
     </div>
