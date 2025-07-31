@@ -1,13 +1,27 @@
 <script setup>
   // формат запроса по нескольким словам в поиске https://c54d42806c01eb8f.mokky.dev/items?title=*Кроссовки*%20*Puma - между словами требуется символ пробела (%20)
   import Header from "./components/Header.vue";
-  import CardList from "./components/Cardlist.vue";
+  import CardList from "./components/CardList.vue";
   import Drawer from "./components/Drawer.vue";
 
-  import { onMounted, reactive, ref, watch, provide } from "vue";
+  import { onMounted, provide, reactive, ref, watch } from "vue";
   import axios from "axios";
 
   const items = ref([]);
+
+  const drawerOpenFlag = ref(false);
+
+  const closeDrawer = () => {
+    drawerOpenFlag.value = false;
+  };
+
+  const openDrawer = () => {
+    drawerOpenFlag.value = true;
+  };
+
+  provide("closeDrawer", closeDrawer);
+  provide("openDrawer", openDrawer);
+  provide("drawerOpenFlag", drawerOpenFlag);
 
   const filters = reactive({
     sortBy: "",
@@ -42,6 +56,7 @@
         ...obj,
         isFavorite: false,
         isAdded: false,
+        favoriteId: null,
       }));
     } catch (err) {
       console.log(err);
@@ -53,9 +68,10 @@
       const { data: favorites } = await axios.get(
         `https://c54d42806c01eb8f.mokky.dev/favorites`
       );
+
       items.value = items.value.map((item) => {
         const favorite = favorites.find(
-          (favorite) => favorite.productId === item.id
+          (favorite) => favorite.parentId === item.id
         );
 
         if (!favorite) {
@@ -65,7 +81,7 @@
         return {
           ...item,
           isFavorite: true,
-          favoriteId: favorite.productId,
+          favoriteId: favorite.id,
         };
       });
     } catch (err) {
@@ -74,11 +90,34 @@
   };
 
   const addToFavorite = async (item) => {
-    item.isFavorite = !item.isFavorite;
-    console.log(item);
-  };
+    try {
+      if (!item.isFavorite) {
+        const obj = {
+          parentId: item.id,
+        };
 
-  provide("addToFavorite", addToFavorite);
+        const { data } = await axios.post(
+          `https://c54d42806c01eb8f.mokky.dev/favorites`,
+          obj
+        );
+
+        item.isFavorite = true;
+        item.favoriteId = data.id;
+
+        console.log(item);
+      } else {
+        console.log(item);
+
+        await axios.delete(
+          `https://c54d42806c01eb8f.mokky.dev/favorites/${item.favoriteId}`
+        );
+        item.isFavorite = false;
+        item.favoriteId = null;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   onMounted(async () => {
     await fetchItems();
@@ -92,11 +131,15 @@
   <div
     class="w-[1080px] mx-auto my-10 bg-white rounded-4xl min-h-[calc(100vh-5rem)] shadow-xl"
   >
-    <!--
-    <Drawer />
-    -->
+    <Drawer v-show="drawerOpenFlag" />
+
     <Header />
-    https://youtu.be/U_-Ht_v-oAs?si=vARm3v3eSu5IZwJb&t=15750
+    <a
+      href="https://youtu.be/U_-Ht_v-oAs?si=dmdt9R-dBZqj1XjY&t=17735"
+      class="hover:text-blue-700 duration-300"
+      target="_blank"
+      >https://youtu.be/U_-Ht_v-oAs?si=dmdt9R-dBZqj1XjY&t=17735</a
+    >
 
     <div class="flex gap-10 items-center justify-between px-10 mt-10">
       <h1 class="text-xl text-4xl font-bold">Все кроссовки</h1>
@@ -129,7 +172,7 @@
         </div>
       </div>
     </div>
-    <CardList :items="items" />
+    <CardList :items="items" @addToFavorite="addToFavorite" />
   </div>
 </template>
 
