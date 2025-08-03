@@ -1,7 +1,7 @@
 <script setup>
   import { inject } from "vue";
 
-  const closeDrawer = inject("closeDrawer");
+  const { closeDrawer } = inject("cart");
 
   import DrawerHead from "./DrawerHead.vue";
   import CartItemList from "./CartItemList.vue";
@@ -30,7 +30,9 @@
 
         <div class="flex gap-1">
           <span>Налог 5%:</span>
-          <div class="flex-1 border-b border-dotted border-gray-700"></div>
+          <div
+            class="flex-1 border-b border-dotted border-gray-700 overscroll-contain"
+          ></div>
           <b>900 руб.</b>
         </div>
 

@@ -8,6 +8,7 @@
   import axios from "axios";
 
   const items = ref([]);
+  const cart = ref([]);
 
   const drawerOpenFlag = ref(false);
 
@@ -19,9 +20,38 @@
     drawerOpenFlag.value = true;
   };
 
-  provide("closeDrawer", closeDrawer);
-  provide("openDrawer", openDrawer);
-  provide("drawerOpenFlag", drawerOpenFlag);
+  const addToCart = (item) => {
+    if (!item.isAdded) {
+      cart.value.push(item);
+      item.isAdded = true;
+    }
+  };
+
+  const removeFromCart = (item) => {
+    cart.value.splice(cart.value.indexOf(item), 1);
+    item.isAdded = false;
+  };
+
+  const onClickAddPlus = (item) => {
+    if (item.isAdded) {
+      removeFromCart(item);
+    } else {
+      addToCart(item);
+    }
+  };
+
+  // provide("closeDrawer", closeDrawer);
+  // provide("openDrawer", openDrawer);
+
+  provide("cart", {
+    cart,
+    closeDrawer,
+    openDrawer,
+    addToCart,
+    removeFromCart,
+    //   drawerOpenFlag,
+  });
+  //provide("drawerOpenFlag", drawerOpenFlag);
 
   const filters = reactive({
     sortBy: "",
@@ -104,9 +134,9 @@
         item.isFavorite = true;
         item.favoriteId = data.id;
 
-        console.log(item);
+        //   console.log(item);
       } else {
-        console.log(item);
+        //   console.log(item);
 
         await axios.delete(
           `https://c54d42806c01eb8f.mokky.dev/favorites/${item.favoriteId}`
@@ -125,6 +155,14 @@
   });
 
   watch(filters, fetchItems);
+
+  watch(drawerOpenFlag, () => {
+    if (drawerOpenFlag.value) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  });
 </script>
 
 <template>
@@ -133,12 +171,12 @@
   >
     <Drawer v-show="drawerOpenFlag" />
 
-    <Header />
+    <Header @open-drawer="openDrawer" />
     <a
-      href="https://youtu.be/U_-Ht_v-oAs?si=dmdt9R-dBZqj1XjY&t=17735"
+      href="https://youtu.be/U_-Ht_v-oAs?si=i-bn38a5d75fejg_&t=19145"
       class="hover:text-blue-700 duration-300"
       target="_blank"
-      >https://youtu.be/U_-Ht_v-oAs?si=dmdt9R-dBZqj1XjY&t=17735</a
+      >https://youtu.be/U_-Ht_v-oAs?si=i-bn38a5d75fejg_&t=19145</a
     >
 
     <div class="flex gap-10 items-center justify-between px-10 mt-10">
@@ -172,7 +210,11 @@
         </div>
       </div>
     </div>
-    <CardList :items="items" @addToFavorite="addToFavorite" />
+    <CardList
+      :items="items"
+      @add-to-favorite="addToFavorite"
+      @add-to-cart="onClickAddPlus"
+    />
   </div>
 </template>
 
