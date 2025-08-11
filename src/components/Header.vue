@@ -3,6 +3,10 @@
 
   // const openDrawer = inject("openDrawer");
 
+  defineProps({
+    totalPrice: Number,
+  });
+
   const emit = defineEmits(["openDrawer"]);
 </script>
 
@@ -24,7 +28,7 @@
         @click="() => emit('openDrawer')"
       >
         <img src="/cart.svg" alt="cart" />
-        <b>1000 руб</b>
+        <b>{{ totalPrice }} руб</b>
       </li>
       <li
         class="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-black transition:color duration-300"

@@ -4,13 +4,20 @@
   import CardList from "./components/CardList.vue";
   import Drawer from "./components/Drawer.vue";
 
-  import { onMounted, provide, reactive, ref, watch } from "vue";
+  import { onMounted, provide, reactive, ref, watch, computed } from "vue";
   import axios from "axios";
 
   const items = ref([]);
   const cart = ref([]);
 
   const drawerOpenFlag = ref(false);
+  const isCreatingOrder = ref(false);
+
+  const totalPrice = computed(() =>
+    cart.value.reduce((summ, item) => summ + item.price, 0)
+  );
+
+  const vatPrice = computed(() => Math.ceil(totalPrice.value * 0.05));
 
   const closeDrawer = () => {
     drawerOpenFlag.value = false;
@@ -149,6 +156,31 @@
     }
   };
 
+  const createOrder = async () => {
+    try {
+      isCreatingOrder.value = true;
+      const { data } = await axios.post(
+        `https://c54d42806c01eb8f.mokky.dev/orders`,
+        {
+          items: cart.value,
+          totalPrice: totalPrice.value,
+        }
+      );
+
+      cart.value = [];
+
+      return data;
+    } catch (err) {
+      console.log(err);
+    } finally {
+      isCreatingOrder.value = false;
+    }
+  };
+
+  const cartButtonDisabled = computed(
+    () => isCreatingOrder.value || cart.value.length === 0
+  );
+
   onMounted(async () => {
     await fetchItems();
     await fetchFavorites();
@@ -163,20 +195,33 @@
       document.body.style.overflow = "";
     }
   });
+
+  watch(cart, () => {
+    items.value = items.value.map((item) => ({
+      ...item,
+      isAdded: false,
+    }));
+  });
 </script>
 
 <template>
   <div
     class="w-[1080px] mx-auto my-10 bg-white rounded-4xl min-h-[calc(100vh-5rem)] shadow-xl"
   >
-    <Drawer v-show="drawerOpenFlag" />
+    <Drawer
+      v-show="drawerOpenFlag"
+      :total-price="totalPrice"
+      :vat-price="vatPrice"
+      @create-order="createOrder"
+      :button-disabled="cartButtonDisabled"
+    />
 
-    <Header @open-drawer="openDrawer" />
+    <Header @open-drawer="openDrawer" :total-price="totalPrice" />
     <a
-      href="https://youtu.be/U_-Ht_v-oAs?si=i-bn38a5d75fejg_&t=19145"
+      href="https://youtu.be/U_-Ht_v-oAs?si=jMaE-r0h2QsBDytu&t=21221"
       class="hover:text-blue-700 duration-300"
       target="_blank"
-      >https://youtu.be/U_-Ht_v-oAs?si=i-bn38a5d75fejg_&t=19145</a
+      >https://youtu.be/U_-Ht_v-oAs?si=jMaE-r0h2QsBDytu&t=21221</a
     >
 
     <div class="flex gap-10 items-center justify-between px-10 mt-10">
