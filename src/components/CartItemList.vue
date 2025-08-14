@@ -6,13 +6,13 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-5 flex-1 overflow-y-auto">
+  <div class="flex flex-col gap-5 flex-1 overflow-y-auto" v-auto-animate>
     <CartItem
       v-for="item in cart"
       :image-url="item.imageUrl"
       :title="item.title"
       :price="item.price"
-      :key="item.id"
+      :key="item.id + Math.random()"
       @on-click-remove="() => removeFromCart(item)"
     />
   </div>

@@ -1,6 +1,4 @@
 <script setup>
-  import { inject } from "vue";
-
   defineProps({
     id: Number,
     imageUrl: {
@@ -26,6 +24,7 @@
     class="flex flex-col border border-gray-200 rounded-3xl py-5 px-8 items-center gap-[14px] relative hover:-translate-y-3 hover:shadow-2xl duration-300 bg-white h-full"
   >
     <img
+      v-if="onClickFavorite"
       :src="!isFavorite ? '/like-1.svg' : '/like-2.svg'"
       alt="like"
       class="absolute top-5 left-5 cursor-pointer hover:drop-shadow duration-300"
@@ -39,6 +38,7 @@
         <p class="text-[14px] font-bold">{{ price }} руб.</p>
       </div>
       <img
+        v-show="onClickAdd"
         :src="!isAdded ? '/plus.svg' : '/checked.svg'"
         alt="plus"
         class="cursor-pointer hover:drop-shadow duration-300"

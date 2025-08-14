@@ -5,6 +5,7 @@
 
   import DrawerHead from "./DrawerHead.vue";
   import CartItemList from "./CartItemList.vue";
+  import infoBlock from "./infoBlock.vue";
 
   defineProps({
     totalPrice: Number,
@@ -27,9 +28,16 @@
     >
       <DrawerHead />
 
-      <CartItemList />
+      <CartItemList v-if="totalPrice" />
 
-      <div class="flex flex-col gap-3 mt-auto">
+      <infoBlock
+        v-else
+        title="Корзина пустая"
+        description="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ."
+        image-url="/package-icon.png"
+      />
+
+      <div v-if="totalPrice" class="flex flex-col gap-3 mt-auto">
         <div class="flex gap-1">
           <span>Итого:</span>
           <div class="flex-1 border-b border-dotted border-gray-700"></div>
