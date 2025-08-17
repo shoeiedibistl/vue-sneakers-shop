@@ -9,6 +9,7 @@
     computed,
   } from "vue";
   import axios from "axios";
+  import debounce from "lodash.debounce";
   import CardList from "@/components/CardList.vue";
 
   const { cart, addToCart, removeFromCart } = inject("cart");
@@ -32,9 +33,9 @@
     filters.sortBy = event.target.value;
   };
 
-  const onChangeSearchInput = (event) => {
+  const onChangeSearchInput = debounce((event) => {
     filters.searchQuery = event.target.value;
-  };
+  }, 500);
 
   const addToFavorite = async (item) => {
     try {

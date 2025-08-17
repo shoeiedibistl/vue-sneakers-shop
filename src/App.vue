@@ -2,15 +2,12 @@
   // формат запроса по нескольким словам в поиске https://c54d42806c01eb8f.mokky.dev/items?title=*Кроссовки*%20*Puma - между словами требуется символ пробела (%20)
   import Header from "./components/Header.vue";
   import Drawer from "./components/Drawer.vue";
-  import Home from "./pages/Home.vue";
 
-  import { onMounted, provide, ref, watch, computed } from "vue";
-  import axios from "axios";
+  import { provide, ref, watch, computed } from "vue";
 
   const cart = ref([]);
 
   const drawerOpenFlag = ref(false);
-  const isCreatingOrder = ref(false);
 
   const totalPrice = computed(() =>
     cart.value.reduce((summ, item) => summ + item.price, 0)
@@ -51,31 +48,6 @@
   });
   //provide("drawerOpenFlag", drawerOpenFlag);
 
-  const createOrder = async () => {
-    try {
-      isCreatingOrder.value = true;
-      const { data } = await axios.post(
-        `https://c54d42806c01eb8f.mokky.dev/orders`,
-        {
-          items: cart.value,
-          totalPrice: totalPrice.value,
-        }
-      );
-
-      cart.value = [];
-
-      return data;
-    } catch (err) {
-      console.log(err);
-    } finally {
-      isCreatingOrder.value = false;
-    }
-  };
-
-  const cartButtonDisabled = computed(
-    () => isCreatingOrder.value || cart.value.length === 0
-  );
-
   watch(drawerOpenFlag, () => {
     if (drawerOpenFlag.value) {
       document.body.style.overflow = "hidden";
@@ -101,8 +73,6 @@
       v-show="drawerOpenFlag"
       :total-price="totalPrice"
       :vat-price="vatPrice"
-      @create-order="createOrder"
-      :button-disabled="cartButtonDisabled"
     />
 
     <Header @open-drawer="openDrawer" :total-price="totalPrice" />
