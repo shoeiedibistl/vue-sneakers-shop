@@ -15,8 +15,6 @@
     onClickAdd: Function,
     onClickFavorite: Function,
   });
-
-  const getAlert = () => alert("click");
 </script>
 
 <template>

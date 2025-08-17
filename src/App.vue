@@ -28,6 +28,8 @@
       cart.value.push(item);
       item.isAdded = true;
     }
+
+    console.log(cart.value);
   };
 
   const removeFromCart = (item) => {
