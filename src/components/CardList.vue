@@ -13,7 +13,7 @@
   <div class="grid grid-cols-4 gap-6 p-10" v-auto-animate>
     <Card
       v-for="item in items"
-      :key="item.id + Math.random()"
+      :key="item.id + '-card'"
       :id="item.id"
       :image-url="item.imageUrl"
       :title="item.title"

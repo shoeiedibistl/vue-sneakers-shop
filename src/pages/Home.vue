@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, reactive, inject, ref, watch } from "vue";
+  import { onMounted, reactive, inject, ref, watch, computed } from "vue";
   import axios from "axios";
   import debounce from "lodash.debounce";
   import CardList from "@/components/CardList.vue";
@@ -8,6 +8,13 @@
 
   const items = ref([]);
   const myFavorites = ref([]);
+
+  const itemsWithCartStatus = computed(() => {
+    return items.value.map((item) => ({
+      ...item,
+      isAdded: cart.value.some((cartItem) => cartItem.id === item.id),
+    }));
+  });
 
   const filters = reactive({
     sortBy: "",
@@ -44,23 +51,47 @@
 
         item.isFavorite = true;
         item.favoriteId = data.id;
+
+        myFavorites.value.push({
+          id: item.favoriteId,
+          item_id: item.id,
+        });
       } else {
         await axios.delete(
           `https://c54d42806c01eb8f.mokky.dev/favorites/${item.favoriteId}`
         );
         item.isFavorite = false;
         item.favoriteId = null;
+
+        myFavorites.value.splice(
+          myFavorites.value.findIndex(
+            (myFavoriteItem) => myFavoriteItem.item_id === item.id
+          ),
+          1
+        );
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      fetchFavorites();
     }
+    //finally {
+    //  fetchFavorites();
+    //  console.log("myFavorites.value", myFavorites.value);
+
+    //  const myCard = myFavorites.value.find(
+    //    (favorite) => favorite.item_id === item.id
+    //  );
+
+    //  console.log("63 myCard", myCard);
+
+    //   myCard.isFavorite = item.isFavorite;
+    //   myCard.favoriteId = item.favoriteId;
+
+    //  console.log("items", items.value);
+    //  console.log("myFavorites", myFavorites.value);
+    // }
   };
 
   const fetchItems = async () => {
-    console.log("cart.value", cart.value);
-
     const params = {
       sortBy: filters.sortBy,
     };
@@ -84,6 +115,7 @@
             : myFavorites.value.some((fav) => fav.item_id === obj.id),
         // isAdded: false,
         isAdded: cart.value.some((item) => item.id === obj.id),
+
         favoriteId:
           myFavorites.value.length < 1
             ? null
@@ -136,14 +168,15 @@
     // }));
   });
 
-  // watch(cart, () => {
-  //   items.value = items.value.map((item) => ({
-  //     ...item,
-  //     isAdded: false,
-  //   }));
-  // });
+  watch(cart, () => {
+    items.value = items.value.map((item) => ({
+      ...item,
+      isAdded: false,
+      //  isAdded: cart.value.some((item) => item.id === obj.id),
+    }));
+  });
 
-  watch(cart, fetchItems, { deep: true });
+  //  watch(cart, fetchItems, { deep: true });
 
   watch(filters, fetchItems);
 </script>
@@ -181,7 +214,7 @@
     </div>
   </div>
   <CardList
-    :items="items"
+    :items="itemsWithCartStatus"
     @add-to-favorite="addToFavorite"
     @add-to-cart="onClickAddPlus"
   />

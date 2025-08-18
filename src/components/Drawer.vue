@@ -13,9 +13,8 @@
   });
 
   const isCreating = ref(false);
-  const orderId = ref(null);
 
-  const { cart, closeDrawer } = inject("cart");
+  const { cart, closeDrawer, orderId } = inject("cart");
 
   const buttonDisabled = computed(
     () => isCreating.value || cart.value.length === 0

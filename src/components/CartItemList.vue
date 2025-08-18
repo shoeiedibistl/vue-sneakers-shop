@@ -12,7 +12,7 @@
       :image-url="item.imageUrl"
       :title="item.title"
       :price="item.price"
-      :key="item.id + Math.random()"
+      :key="item.id + 'cart-item'"
       @on-click-remove="() => removeFromCart(item)"
     />
   </div>

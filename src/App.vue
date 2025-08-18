@@ -9,6 +9,8 @@
 
   const drawerOpenFlag = ref(false);
 
+  const orderId = ref(null);
+
   const totalPrice = computed(() =>
     cart.value.reduce((summ, item) => summ + item.price, 0)
   );
@@ -32,15 +34,25 @@
       cart.value.push(item);
       item.isAdded = true;
     }
+
+    if (orderId.value) {
+      orderId.value = null;
+    }
+
+    console.log("cart", cart.value);
   };
 
   const removeFromCart = (item) => {
-    const itemToRemove = cart.value.find((cartItem) => cartItem.id === item.id);
+    // const itemToRemove = cart.value.find((cartItem) => cartItem.id === item.id);
 
     //  cart.value.splice(cart.value.indexOf(item), 1);
-    cart.value.splice(cart.value.indexOf(itemToRemove), 1);
+    // cart.value.splice(cart.value.indexOf(itemToRemove), 1);
 
-    item.isAdded = false;
+    // item.isAdded = false;
+
+    cart.value = cart.value.filter((cartItem) => cartItem.id !== item.id);
+
+    console.log(cart.value);
   };
 
   // provide("closeDrawer", closeDrawer);
@@ -52,6 +64,7 @@
     openDrawer,
     addToCart,
     removeFromCart,
+    orderId,
     //   drawerOpenFlag,
   });
   //provide("drawerOpenFlag", drawerOpenFlag);
@@ -84,12 +97,6 @@
     />
 
     <Header @open-drawer="openDrawer" :total-price="totalPrice" />
-    <a
-      href="https://youtu.be/U_-Ht_v-oAs?si=NGziC4rdHbS_whh8&t=25961"
-      class="hover:text-blue-700 duration-300"
-      target="_blank"
-      >https://youtu.be/U_-Ht_v-oAs?si=NGziC4rdHbS_whh8&t=25961</a
-    >
 
     <div class="p-10"><RouterView /></div>
   </div>
