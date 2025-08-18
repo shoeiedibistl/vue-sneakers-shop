@@ -24,14 +24,22 @@
   };
 
   const addToCart = (item) => {
-    if (!item.isAdded) {
+    if (
+      !item.isAdded
+      // &&
+      //!cart.value.some((cartItem) => cartItem.id === item.id)
+    ) {
       cart.value.push(item);
       item.isAdded = true;
     }
   };
 
   const removeFromCart = (item) => {
-    cart.value.splice(cart.value.indexOf(item), 1);
+    const itemToRemove = cart.value.find((cartItem) => cartItem.id === item.id);
+
+    //  cart.value.splice(cart.value.indexOf(item), 1);
+    cart.value.splice(cart.value.indexOf(itemToRemove), 1);
+
     item.isAdded = false;
   };
 

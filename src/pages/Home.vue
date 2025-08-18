@@ -1,13 +1,5 @@
 <script setup>
-  import {
-    onMounted,
-    provide,
-    reactive,
-    inject,
-    ref,
-    watch,
-    computed,
-  } from "vue";
+  import { onMounted, reactive, inject, ref, watch } from "vue";
   import axios from "axios";
   import debounce from "lodash.debounce";
   import CardList from "@/components/CardList.vue";
@@ -15,6 +7,7 @@
   const { cart, addToCart, removeFromCart } = inject("cart");
 
   const items = ref([]);
+  const myFavorites = ref([]);
 
   const filters = reactive({
     sortBy: "",
@@ -51,11 +44,7 @@
 
         item.isFavorite = true;
         item.favoriteId = data.id;
-
-        //   console.log(item);
       } else {
-        //   console.log(item);
-
         await axios.delete(
           `https://c54d42806c01eb8f.mokky.dev/favorites/${item.favoriteId}`
         );
@@ -64,10 +53,14 @@
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      fetchFavorites();
     }
   };
 
   const fetchItems = async () => {
+    console.log("cart.value", cart.value);
+
     const params = {
       sortBy: filters.sortBy,
     };
@@ -85,9 +78,17 @@
       );
       items.value = data.map((obj) => ({
         ...obj,
-        isFavorite: false,
-        isAdded: false,
-        favoriteId: null,
+        isFavorite:
+          myFavorites.value.length < 1
+            ? false
+            : myFavorites.value.some((fav) => fav.item_id === obj.id),
+        // isAdded: false,
+        isAdded: cart.value.some((item) => item.id === obj.id),
+        favoriteId:
+          myFavorites.value.length < 1
+            ? null
+            : myFavorites.value.filter((fav) => fav.item_id === obj.id)[0]
+                ?.id || null,
       }));
     } catch (err) {
       console.log(err);
@@ -96,12 +97,14 @@
 
   const fetchFavorites = async () => {
     try {
-      const { data: favorites } = await axios.get(
+      const { data: myData } = await axios.get(
         `https://c54d42806c01eb8f.mokky.dev/favorites`
       );
 
+      myFavorites.value = myData;
+
       items.value = items.value.map((item) => {
-        const favorite = favorites.find(
+        const favorite = myFavorites.value.find(
           (favorite) => favorite.item_id === item.id
         );
 
@@ -127,18 +130,20 @@
     await fetchItems();
     await fetchFavorites();
 
-    items.value = items.value.map((item) => ({
-      ...item,
-      isAdded: cart.value.some((cartItem) => cartItem.id === item.id),
-    }));
+    // items.value = items.value.map((item) => ({
+    //   ...item,
+    //   isAdded: cart.value.some((cartItem) => cartItem.id === item.id),
+    // }));
   });
 
-  watch(cart, () => {
-    items.value = items.value.map((item) => ({
-      ...item,
-      isAdded: false,
-    }));
-  });
+  // watch(cart, () => {
+  //   items.value = items.value.map((item) => ({
+  //     ...item,
+  //     isAdded: false,
+  //   }));
+  // });
+
+  watch(cart, fetchItems, { deep: true });
 
   watch(filters, fetchItems);
 </script>
