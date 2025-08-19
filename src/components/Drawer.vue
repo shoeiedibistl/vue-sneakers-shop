@@ -1,6 +1,4 @@
 <script setup>
-  //const { closeDrawer } = inject("cart");
-
   import DrawerHead from "./DrawerHead.vue";
   import CartItemList from "./CartItemList.vue";
   import infoBlock from "./infoBlock.vue";

@@ -16,6 +16,8 @@
     }));
   });
 
+  console.log("itemsWithCartStatus", itemsWithCartStatus);
+
   const filters = reactive({
     sortBy: "",
     searchQuery: "",
@@ -53,8 +55,8 @@
         item.favoriteId = data.id;
 
         myFavorites.value.push({
-          id: item.favoriteId,
           item_id: item.id,
+          id: item.favoriteId,
         });
       } else {
         await axios.delete(
@@ -72,23 +74,10 @@
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      console.log(item);
+      console.log(myFavorites.value);
     }
-    //finally {
-    //  fetchFavorites();
-    //  console.log("myFavorites.value", myFavorites.value);
-
-    //  const myCard = myFavorites.value.find(
-    //    (favorite) => favorite.item_id === item.id
-    //  );
-
-    //  console.log("63 myCard", myCard);
-
-    //   myCard.isFavorite = item.isFavorite;
-    //   myCard.favoriteId = item.favoriteId;
-
-    //  console.log("items", items.value);
-    //  console.log("myFavorites", myFavorites.value);
-    // }
   };
 
   const fetchItems = async () => {
@@ -113,7 +102,6 @@
           myFavorites.value.length < 1
             ? false
             : myFavorites.value.some((fav) => fav.item_id === obj.id),
-        // isAdded: false,
         isAdded: cart.value.some((item) => item.id === obj.id),
 
         favoriteId:
@@ -161,22 +149,14 @@
 
     await fetchItems();
     await fetchFavorites();
-
-    // items.value = items.value.map((item) => ({
-    //   ...item,
-    //   isAdded: cart.value.some((cartItem) => cartItem.id === item.id),
-    // }));
   });
 
   watch(cart, () => {
     items.value = items.value.map((item) => ({
       ...item,
       isAdded: false,
-      //  isAdded: cart.value.some((item) => item.id === obj.id),
     }));
   });
-
-  //  watch(cart, fetchItems, { deep: true });
 
   watch(filters, fetchItems);
 </script>

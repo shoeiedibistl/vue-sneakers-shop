@@ -24,6 +24,7 @@
         isFavorites ? null : () => emit('addToFavorite', item)
       "
       :is-added="item.isAdded"
+      :sizes="item.sizes"
     />
   </div>
 </template>

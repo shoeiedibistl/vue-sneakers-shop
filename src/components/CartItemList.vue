@@ -14,6 +14,7 @@
       :price="item.price"
       :key="item.id + 'cart-item'"
       @on-click-remove="() => removeFromCart(item)"
+      :size="item.size"
     />
   </div>
 </template>

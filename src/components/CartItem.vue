@@ -4,6 +4,10 @@
     imageUrl: String,
     title: String,
     price: Number,
+    size: {
+      type: Number,
+      default: 0,
+    },
   });
 
   const emit = defineEmits(["onClickRemove"]);
@@ -14,8 +18,10 @@
     <img :src="imageUrl" :alt="title" class="w-[70px] h-[70px]" />
     <div class="flex flex-col gap-4 grow">
       <p>{{ title }}</p>
+      <p>{{ size }} размер</p>
       <div class="flex justify-between items-end">
         <b class="flex-1">{{ price }} руб.</b>
+
         <img
           src="/close.svg"
           alt=""

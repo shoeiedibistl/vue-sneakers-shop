@@ -1,8 +1,6 @@
 <script setup>
   import { RouterLink } from "vue-router";
 
-  // const openDrawer = inject("openDrawer");
-
   defineProps({
     totalPrice: Number,
   });
